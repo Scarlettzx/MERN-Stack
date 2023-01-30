@@ -4,21 +4,29 @@ const path = require('path');
 const { logger } = require('./middleware/logger')
 const errorHandler = require('./middleware/errorHandler')
 const cookieParser = require('cookie-parser');
+const cors = require('cors')
+const corsOptions = require('./config/corsOptions')
 const PORT = process.env.PORT || 3500;
 const morgan = require("morgan");
 const chalk = require("Chalk");
 
+// ! log file
 app.use(logger)
-
+// ! cors 
+// ! People use API for URL fetch(http://localhost:3500) is Public cors()
+// ! now we use corsOptions setup cors for setup URL ที่ Allow accept
+app.use(cors(corsOptions))
 app.use(morgan("dev"));
 
-app.use('/', express.static(path.join(__dirname, 'public')))
-
-app.use(cookieParser())
 
 app.use(express.json())
 
+app.use(cookieParser())
+
+app.use('/', express.static(path.join(__dirname, 'public')))
+
 app.use('/', require('./routes/root'))
+
 app.all('*',(req, res)=>{
     res.status(404)
     if(req.accepts('html')){
